@@ -554,6 +554,10 @@ video {
   display: none;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .absolute {
   position: absolute;
 }
@@ -682,10 +686,6 @@ video {
   padding: 1.25rem;
 }
 
-.p-2 {
-  padding: 0.5rem;
-}
-
 .pl-5 {
   padding-left: 1.25rem;
 }
@@ -762,5 +762,11 @@ video {
 .focus\:ring-\[\#3D4044\]:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(61 64 68 / var(--tw-ring-opacity, 1));
+}
+
+@media (min-width: 768px) {
+  .md\:invisible {
+    visibility: hidden;
+  }
 }
 

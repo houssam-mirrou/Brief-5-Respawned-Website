@@ -1,7 +1,9 @@
 
 
 const card_holder = document.querySelector(".card-holder");
+const sort_class = document.querySelector(".sort-class");
 
+sort_class.style.display = "none";
 
 function create_card(game) {
     //creating card icons
@@ -83,12 +85,9 @@ function create_card(game) {
 async function add_cards() {
     let card = [];
     try {
-        const res = await fetch("http://16.16.171.104:3000/api/games");
+        const res = await fetch("https://debuggers-games-api.duckdns.org/api/games");
         const data = await res.json();
-        let games = data.results;
-        for (let game of games) {
-            create_card(game);
-        }
+        console.log(data);
 
     }
     catch (err) {
