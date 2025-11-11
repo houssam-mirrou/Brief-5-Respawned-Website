@@ -366,6 +366,31 @@ function createPlatItem(genreName) {
     return item_div;
 }
 
+function filter_by_rate(game_filtred, limit) {
+    let sorted_games = [...game_filtred];
+
+    // Sort descending by rating
+    sorted_games.sort((a, b) => b.rating - a.rating);
+
+    // Limit results if limit is defined (e.g., Top 100)
+    if (limit && limit > 0) {
+        sorted_games = sorted_games.slice(0, limit);
+    }
+
+    return sorted_games;
+}
+function best_rate(game_filtred, rate) {
+    if (rate === "Top 100" || rate === 100) {
+        return filter_by_rate(game_filtred, 100);
+    } else if (rate === "Top 200" || rate === 200) {
+        return filter_by_rate(game_filtred, 200);
+    } else if (rate === "Top 300" || rate === 300) {
+        return filter_by_rate(game_filtred, 300);
+    } else {
+        return game_filtred; // no filter applied
+    }
+}
+
 function showMorePlatforms(container, plat, moreButton) {
     for (let i = 8; i < plat.length; i++) {
         const item_div = createPlatItem(plat[i]);
@@ -409,10 +434,12 @@ function add_rating() {
             if (lastChecked === this) {
                 this.checked = false;
                 lastChecked = null;
-                console.log("unchecked");
+                apply_filters();
             } else {
                 lastChecked = this;
-                console.log("checked:", this.id);
+                const topLimit = rat_arr[i];
+                console.log("Filtering by top:", topLimit);
+                apply_filters(current_games_array, topLimit);
             }
         });
     }
@@ -424,10 +451,10 @@ let paltfom_selected = "";
 let genre_selected = [];
 let game_filtred = [];
 
-function apply_filters(game_list = current_games_array) {
+function apply_filters(game_list = current_games_array, topLimit = null) {
     game_filtred = [];
 
-    isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0);
+    isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0) || topLimit!=0;
 
     for (let game of game_list) {
         let platform_match = false;
@@ -472,6 +499,9 @@ function apply_filters(game_list = current_games_array) {
         }
     }
 
+    if (topLimit) {
+        game_filtred = filter_by_rate(game_filtred, topLimit);
+    }
 
     while (card_holder.firstChild) {
         card_holder.removeChild(card_holder.firstChild);
@@ -489,7 +519,7 @@ function apply_filters(game_list = current_games_array) {
         results.textContent = "Results found: " + game_filtred.length;
     }
 
-    if (!paltfom_selected && (!genre_selected || genre_selected.length === 0)) {
+    if (!paltfom_selected && (!genre_selected || genre_selected.length === 0) && !topLimit) {
         isFiltering = false;
     }
 
@@ -628,6 +658,7 @@ async function add_cards() {
         console.log("problem in " + err);
     }
 }
+
 
 
 async function add_filter() {
