@@ -177,13 +177,344 @@ function create_card(game) {
 }
 
 
+function add_genre(genres) {
+    genre_items.innerHTML = "";
+    const temp_but = document.createElement("button");
+    temp_but.classList.add("text-left", "flex");
+    temp_but.textContent = genres.length - 8 + " More";
+    for (let i = 0; i < Math.min(8, genres.length); i++) {
+        const item_div = createGenreItem(genres[i]);
+        genre_items.appendChild(item_div);
+    }
+
+    if (genres.length > 8) {
+        genre_items.appendChild(temp_but);
+    }
+
+    temp_but.addEventListener("click", () => {
+        showMoreGenres(genre_items, genres, temp_but);
+    });
+
+    genre_filter.addEventListener("input", (event) => {
+        if (event.target.value === "") {
+            add_genre(genres);
+            return;
+        }
+        filter_genre(genres, event);
+    });
+
+}
+
+let genre_array = [];
+
+function filter_genre(genres, event) {
+    genre_array = [];
+    while (genre_items.firstChild) {
+        genre_items.removeChild(genre_items.firstChild);
+    }
+    for (let genre_names of genres) {
+        let temp = genre_names.trim().toLowerCase();
+        if (isSubsequence(temp, event.target.value) === true) {
+            const item_div = createGenreItem(genre_names);
+            genre_array.push(item_div);
+        }
+        if (genre_array.length > 0) {
+            for (let genre of genre_array) {
+                genre_items.appendChild(genre);
+            }
+        }
+    }
+}
+
+
+function createGenreItem(genreName) {
+    const item_div = document.createElement("div");
+    item_div.classList.add("flex", "flex-row", "gap-2");
+    const item = document.createElement("input");
+    item.type = "checkbox";
+    item.id = genreName;
+    item.addEventListener("click", (event) => {
+        if (event.target.checked) {
+            genre_selected.push(genreName);
+        }
+        else {
+            let newArr = [];
+            for (let g of genre_selected) {
+                if (g !== genreName) {
+                    newArr.push(g);
+                }
+            }
+            genre_selected = newArr;
+
+        }
+        apply_filters();
+    })
+
+    const label = document.createElement("label");
+    label.htmlFor = genreName;
+    label.textContent = genreName;
+
+    item_div.appendChild(item);
+    item_div.appendChild(label);
+    return item_div;
+}
+
+function showMoreGenres(container, genres, moreButton) {
+
+    for (let i = 8; i < genres.length; i++) {
+        const item_div = createGenreItem(genres[i]);
+        container.appendChild(item_div);
+    }
+
+    moreButton.style.display = "none";
+
+    const lessButton = document.createElement("button");
+    lessButton.classList.add("text-left", "flex");
+    lessButton.textContent = "Less";
+    container.appendChild(lessButton);
+
+    lessButton.addEventListener("click", () => {
+        container.innerHTML = "";
+        add_genre(genres);
+    });
+}
+
+function add_plateforms(plat) {
+    plat_items.innerHTML = "";
+    const temp_but = document.createElement("button");
+    temp_but.classList.add("text-left", "flex");
+    temp_but.textContent = plat.length - 8 + " More";
+
+    for (let i = 0; i < Math.min(8, plat.length); i++) {
+        const item_div = createPlatItem(plat[i]);
+        plat_items.appendChild(item_div);
+    }
+
+    if (plat.length > 8) {
+        plat_items.appendChild(temp_but);
+    }
+
+    temp_but.addEventListener("click", () => {
+        showMorePlatforms(plat_items, plat, temp_but);
+    });
+
+    platform_filter.addEventListener("input", (event) => {
+        if (event.target.value === "") {
+            add_plateforms(plat);
+            return;
+        }
+        filter_plats(plat, event);
+    });
+
+}
+
+
+let plat_array = [];
+
+function filter_plats(plats, event) {
+    plat_array = [];
+    while (plat_items.firstChild) {
+        plat_items.removeChild(plat_items.firstChild);
+    }
+    for (let plat of plats) {
+        let temp = plat.trim().toLowerCase();
+        if (isSubsequence(temp, event.target.value) === true) {
+            const item_div = createPlatItem(plat);
+            plat_array.push(item_div);
+        }
+        if (plat_array.length > 0) {
+            for (let genre of plat_array) {
+                plat_items.appendChild(genre);
+            }
+        }
+    }
+
+
+}
+
+
+let lastChecked = null;
+
+
+function createPlatItem(genreName) {
+    const item_div = document.createElement("div");
+    item_div.classList.add("flex", "flex-row", "gap-2");
+
+    const item = document.createElement("input");
+    item.type = "radio";
+    item.id = genreName;
+    item.name = "genre";
+
+    item.addEventListener("click", function () {
+        if (lastChecked === this) {
+            this.checked = false;
+            lastChecked = null;
+            paltfom_selected = "";
+        } else {
+            lastChecked = this;
+            paltfom_selected = genreName;
+        }
+        apply_filters();
+    });
+
+    const label = document.createElement("label");
+    label.htmlFor = genreName;
+    label.textContent = genreName;
+
+    item_div.appendChild(item);
+    item_div.appendChild(label);
+    return item_div;
+}
+
+function showMorePlatforms(container, plat, moreButton) {
+    for (let i = 8; i < plat.length; i++) {
+        const item_div = createPlatItem(plat[i]);
+        container.appendChild(item_div);
+    }
+
+    moreButton.style.display = "none";
+
+    const lessButton = document.createElement("button");
+    lessButton.classList.add("text-left", "flex");
+    lessButton.textContent = "Less";
+    container.appendChild(lessButton);
+
+    lessButton.addEventListener("click", () => {
+        container.innerHTML = "";
+        add_plateforms(plat);
+    });
+}
+
+
+
+function add_rating() {
+    const rating = document.querySelector(".rating-items");
+    const rat_arr = ["100", "200", "300"]
+    rating.classList.add("flex", "flex-col", "text-xl", "gap-2");
+    let lastChecked = null;
+    for (let i = 0; i < 3; i++) {
+        const item_div = document.createElement("div");
+        item_div.classList.add("flex", "flex-row", "gap-2");
+        const item = document.createElement("input");
+        item.type = "radio";
+        item.id = rat_arr[i];
+        item.name = "plat";
+        const label = document.createElement("label");
+        label.htmlFor = rat_arr[i];
+        label.textContent = "Top " + rat_arr[i];
+        item_div.appendChild(item);
+        item_div.appendChild(label);
+        rating.appendChild(item_div);
+        item.addEventListener("click", function () {
+            if (lastChecked === this) {
+                this.checked = false;
+                lastChecked = null;
+                console.log("unchecked");
+            } else {
+                lastChecked = this;
+                console.log("checked:", this.id);
+            }
+        });
+    }
+}
+
+
+
+let paltfom_selected = "";
+let genre_selected = [];
+let game_filtred = [];
+
+function apply_filters(game_list = current_games_array) {
+    game_filtred = [];
+
+    isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0);
+
+    for (let game of game_list) {
+        let platform_match = false;
+        let genre_match = false;
+
+        if (paltfom_selected === "" || paltfom_selected === undefined) {
+            platform_match = true;
+        } else {
+            for (let plat of game.platforms) {
+                if (paltfom_selected === plat.platform.name) {
+                    platform_match = true;
+                    break;
+                }
+            }
+        }
+
+        if (genre_selected.length === 0) {
+            genre_match = true;
+        } else {
+            let i = 1;
+            for (let selected of genre_selected) {
+                let found = false;
+                for (let genr of game.genres) {
+                    if (selected === genr.name) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    i = 0;
+                    break;
+                }
+            }
+            if (i == 1) {
+                genre_match = true;
+            }
+        }
+
+
+        if (platform_match && genre_match) {
+            game_filtred.push(game);
+        }
+    }
+
+
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+
+    console.log(game_filtred);
+
+    if (game_filtred.length === 0) {
+        add_all_cards_unclick_filter(game_list);
+        results.textContent = "No games were found with your filter";
+    } else {
+        for (let game of game_filtred) {
+            create_card(game);
+        }
+        results.textContent = "Results found: " + game_filtred.length;
+    }
+
+    if (!paltfom_selected && (!genre_selected || genre_selected.length === 0)) {
+        isFiltering = false;
+    }
+
+}
+
+
+
+let games;
+
+function add_all_cards_unclick_filter() {
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+    for (let game of current_games_array) {
+        create_card(game);
+    }
+}
+
 function add_all_card(games) {
     for (let game of games) {
         create_card(game);
     }
 }
 
-let isLoading = false;
+let page_tracker = 1;
 
 async function add_rest_card(next_pointer) {
     try {
@@ -211,11 +542,31 @@ async function add_rest_card(next_pointer) {
     }
 }
 
-
-
 let current_games_array = [];
 
+function isSubsequence(gameName, searchString) {
+    return gameName.toLowerCase().includes(searchString.toLowerCase());
+}
 
+function search_bar_page_filter(string) {
+    let array_list_temp = [];
+    for (let game of current_games_array) {
+        let temp = game.name.trim().toLowerCase();
+        if (isSubsequence(temp, string) === true) {
+            array_list_temp.push(game);
+        }
+    }
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+    for (let game of array_list_temp) {
+        create_card(game);
+    }
+}
+
+let isSearching = false;
+let isFiltering = false;
+let isLoading = false;
 async function add_cards() {
     try {
         const res = await fetch("https://debuggers-games-api.duckdns.org/api/games");
@@ -237,7 +588,9 @@ async function add_cards() {
         isLoading = false;
 
         window.addEventListener('scroll', () => {
-            
+            if (isSearching === true || isFiltering === true) {
+                return;
+            }
 
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
 
@@ -291,8 +644,6 @@ async function add_filter() {
         console.log("problem in " + err);
     }
 }
-
-
 
 add_cards();
 add_filter();
