@@ -183,6 +183,35 @@ function add_all_card(games) {
     }
 }
 
+let isLoading = false;
+
+async function add_rest_card(next_pointer) {
+    try {
+        let loading_holder = document.createElement("div");
+        let loading_icon = document.createElement("i");
+        loading_holder.classList.add("flex", "items-center", "w-full");
+        loading_icon.classList.add("fa-solid", "fa-circle-notch", "fa-spin", "text-4xl");
+        loading_holder.appendChild(loading_icon);
+        card_holder.appendChild(loading_holder);
+        const next_re = await fetch(next_pointer);
+        const next = await next_re.json();
+        console.log(next);
+        for (let next_game of next.results) {
+            current_games_array.push(next_game);
+            create_card(next_game);
+        }
+        games = next;
+        console.log(card_holder);
+        card_holder.removeChild(loading_holder);
+        results.textContent = "Results found: " + current_games_array.length;
+        isLoading = false;
+
+    } catch (err) {
+        console.log("Problem in : " + err);
+    }
+}
+
+
 
 let current_games_array = [];
 
@@ -208,9 +237,7 @@ async function add_cards() {
         isLoading = false;
 
         window.addEventListener('scroll', () => {
-            if (isSearching === true || isFiltering === true) {
-                return;
-            }
+            
 
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
 
