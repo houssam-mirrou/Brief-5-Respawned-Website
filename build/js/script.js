@@ -14,9 +14,10 @@ const plat_items = document.querySelector(".patform-items");
 plat_items.classList.add("flex", "flex-col", "text-xl", "gap-2");
 const home = document.querySelector(".home");
 const favorite = document.querySelector(".favorite");
+const game_pop_up = document.querySelector(".game-pop-up");
+const filter_body_conainer = document.querySelector(".filter-body-conainer");
 
-function create_card(game) {
-    //creating card icons
+function create_icons(plateforms) {
     let ps_icon = document.createElement("i");
     let xbox_icon = document.createElement("i");
     let win_icon = document.createElement("i");
@@ -25,7 +26,6 @@ function create_card(game) {
     let lin_icon = document.createElement("i");
     let mac_icon = document.createElement("i");
     let nin_icon = document.createElement("i");
-    let fav_icon = document.createElement("i");
     ps_icon.classList.add("fa-brands", "fa-playstation", "text-2xl");
     xbox_icon.classList.add("fa-brands", "fa-xbox", "text-2xl");
     win_icon.classList.add("fa-brands", "fa-windows", "text-2xl");
@@ -49,24 +49,11 @@ function create_card(game) {
                     </defs>
                 </svg>`;
 
-    fav_icon.classList.add("ri-heart-3-line", "text-3xl");
-    //game title
-    let title = document.createElement("h1");
-    title.classList.add("text-xl");
-    title.textContent = game.name;
-    //game image
-    let game_img = document.createElement("img");
-    game_img.src = game.background_image;
-    game_img.classList.add("rounded-t-3xl");
-    //game card
-    let card = document.createElement("div");
-    //icon holder
-
 
     let icon_holder = document.createElement("div");
     icon_holder.classList.add("flex", "flex-row");
     let sting = [];
-    for (let plat of game.platforms) {
+    for (let plat of plateforms) {
         switch (plat.platform.name) {
             case "PlayStation 4":
             case "PlayStation 5":
@@ -111,6 +98,28 @@ function create_card(game) {
         }
         sting.push(plat.platform.name);
     }
+    return icon_holder;
+}
+
+function create_card(game) {
+    //creating card icons
+
+    let fav_icon = document.createElement("i");
+    fav_icon.classList.add("ri-heart-3-line", "text-3xl");
+    //game title
+    let title = document.createElement("h1");
+    title.classList.add("text-xl");
+    title.textContent = game.name;
+    //game image
+    let game_img = document.createElement("img");
+    game_img.src = game.background_image;
+    game_img.classList.add("rounded-t-3xl");
+    //game card
+    let card = document.createElement("div");
+    //icon holder
+
+
+    let icon_holder = create_icons(game.platforms);
 
     let fav_holder = document.createElement("div");
     fav_holder.classList.add("flex", "justify-end", "w-11/12");
@@ -171,8 +180,122 @@ function create_card(game) {
     card.appendChild(text_container);
     const card_div = document.createElement("div");
     card_div.classList.add("inline-block", "break-inside-avoid", "mb-6");
+    let temp_icons = document.createElement("div");
+    const copy = icon_holder.cloneNode(true);
+    temp_icons.appendChild(copy);
+    let temp_list =
+    {
+        img: game.background_image,
+        game_name: game.name,
+        plateforms: game.platforms,
+        genre: game.genres,
+        date: game.released,
+        rating: game.rating,
+        about: game.description
+    }
+    card_div.addEventListener("click", () => {
+        pop_up = true;
+        while (game_pop_up.firstChild) {
+            game_pop_up.removeChild(game_pop_up.firstChild);
+        }
+        game_pop(temp_list);
+        game_pop_up.classList.toggle("hidden");
+        filter_body_conainer.classList.toggle("hidden");
+
+    });
     card_div.appendChild(card);
     card_holder.appendChild(card_div);
+
+}
+
+let pop_up = false;
+
+function game_pop(game) {
+    const temp_pop = document.createElement("div");
+    temp_pop.classList.add("flex", "flex-col", "text-white", "text-2xl", "rounded-3xl", "bg-[#5F6261]", "w-full");
+    const head_div = document.createElement("div");
+    head_div.classList.add("flex", "flex-row");
+    const img_div = document.createElement("div");
+    img_div.classList.add("h-4/6", "w-4/6");
+    const img = document.createElement("img");
+    img.src = game.img;
+    img.classList.add(
+        "rounded-tl-3xl",
+        "w-3/5",
+        "h-96",
+        "object-cover",
+        "object-center",
+        "shadow-md"
+    );
+    img_div.appendChild(img);
+    head_div.appendChild(img);
+    const right_container = document.createElement("div");
+    right_container.classList.add("flex", "flex-col", "w-1/2", "p-8", "gap-3");
+    const title_div = document.createElement("div");
+    title_div.classList.add("flex", "flex-row", "place-content-between");
+    const tem_title = document.createElement("h1");
+    tem_title.textContent = game.game_name;
+    const fav_icon = document.createElement("i");
+    fav_icon.classList.add("ri-heart-3-line", "text-3xl");
+    title_div.appendChild(tem_title);
+    title_div.appendChild(fav_icon);
+    const icons_div = create_icons(game.plateforms);
+    icons_div.classList.add("gap-3");
+    let genre_type = [];
+    for (let string of game.genre) {
+        genre_type.push(string.name);
+    }
+    const genre = document.createElement("h2");
+    genre.textContent = "Genre :";
+    genre.classList.add("text-[#B0B3B8]");
+    const type = document.createElement("h2");
+    type.textContent = genre_type.join(', ');
+    type.classList.add("text-end");
+    const rel_date = document.createElement("h2");
+    rel_date.textContent = "Release Date :";
+    rel_date.classList.add("text-[#B0B3B8]");
+    const rating = document.createElement("h2");
+    rating.textContent = "Rating :";
+    rating.classList.add("text-[#B0B3B8]");
+    const date = document.createElement("h2");
+    date.textContent = game.date;
+    date.classList.add("text-end");
+    const rank = document.createElement("h2");
+    rank.textContent = game.rating;
+    rank.classList.add("text-end");
+    right_container.appendChild(title_div);
+    right_container.appendChild(icons_div);
+    right_container.appendChild(rel_date);
+    right_container.appendChild(date);
+    right_container.appendChild(genre);
+    right_container.appendChild(type);
+    right_container.appendChild(rating);
+    right_container.appendChild(rank);
+    head_div.appendChild(right_container);
+    const about_div = document.createElement("div");
+    about_div.classList.add("flex", "flex-col", "gap-3","pl-10","pr-10","pb-10","pt-5");
+    const about = document.createElement("h1");
+    about.textContent = "About";
+    const description = document.createElement("p");
+    description.textContent = game.about;
+    description.classList.add("text-[#B0B3B8]");
+    const words = game.about.split(/\s+/);     // split by any spaces
+    const first30 = words.slice(0, 30).join(" ");
+    about_div.appendChild(about);
+    about_div.appendChild(description);
+    temp_pop.appendChild(head_div);
+    temp_pop.appendChild(about_div);
+    game_pop_up.appendChild(temp_pop);
+    game_pop_up.addEventListener("click", (event) => {
+
+        console.log(pop_up);
+        if (event.target === game_pop_up) {
+            game_pop_up.classList.add("hidden");
+            filter_body_conainer.classList.remove("hidden");
+        }
+        pop_up = false;
+        console.log(pop_up);
+    })
 
 }
 
@@ -369,10 +492,8 @@ function createPlatItem(genreName) {
 function filter_by_rate(game_filtred, limit) {
     let sorted_games = [...game_filtred];
 
-    // Sort descending by rating
     sorted_games.sort((a, b) => b.rating - a.rating);
 
-    // Limit results if limit is defined (e.g., Top 100)
     if (limit && limit > 0) {
         sorted_games = sorted_games.slice(0, limit);
     }
@@ -454,7 +575,7 @@ let game_filtred = [];
 function apply_filters(game_list = current_games_array, topLimit = null) {
     game_filtred = [];
 
-    isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0) || topLimit!=0;
+    isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0) || topLimit != 0;
 
     for (let game of game_list) {
         let platform_match = false;
@@ -542,6 +663,8 @@ function add_all_card(games) {
     for (let game of games) {
         create_card(game);
     }
+    results.textContent = "Results found: " + games.length;
+
 }
 
 let page_tracker = 1;
@@ -592,7 +715,10 @@ function search_bar_page_filter(string) {
     for (let game of array_list_temp) {
         create_card(game);
     }
+    results.textContent = "Game were found : " + array_list_temp.length;
+
 }
+
 
 let isSearching = false;
 let isFiltering = false;
@@ -618,7 +744,7 @@ async function add_cards() {
         isLoading = false;
 
         window.addEventListener('scroll', () => {
-            if (isSearching === true || isFiltering === true) {
+            if (isSearching === true || isFiltering === true || pop_up === true) {
                 return;
             }
 
