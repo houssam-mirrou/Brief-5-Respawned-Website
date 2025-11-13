@@ -12,10 +12,12 @@
 
 <body>
     <nav class="bg-[#2E2E2E] flex flex-row p-5 text-white items-center text-3xl gap-1 font-medium md:p-4 lg:p-3">
-        <img src="img/logoo.jpeg" alt="logo" class="w-20">
-        RESPAWNED
+        <div class="flex flex-row items-center nav-home">
+            <img src="img/logoo.jpeg" alt="logo" class="w-20">
+            RESPAWNED
+        </div>
         <div class="flex justify-end w-11/12 md:hidden">
-            <i class="fa-regular fa-heart items-end text-4xl"></i>
+            <i class="fa-regular fa-heart items-end text-4xl phone-heart"></i>
         </div>
     </nav>
     <main class="bg-[#737671]">
@@ -26,11 +28,11 @@
             <div
                 class="p-5 flex flex-col gap-4 bg-[#5F6261] md:w-1/4 hidden md:flex filter md:bg-[#737671] md:border-r-4 md:border-[#5F6261] md:">
                 <div class="flex flex-row items-center gap-3 text-3xl home hidden md:flex">
-                    <i class="ri-home-4-fill"></i>
+                    <i class="ri-home-4-fill home-icon"></i>
                     <h1 class="text-2xl font-semibold">Home</h1>
                 </div>
                 <div class="flex flex-row items-center gap-3 text-3xl favorites hidden md:flex">
-                    <i class="ri-heart-3-line"></i>
+                    <i class="ri-heart-3-line fav-icon"></i>
                     <h1 class="text-2xl font-semibold">Favorites</h1>
                 </div>
                 <div class="flex place-content-between items-center">
@@ -86,7 +88,7 @@
                 </div>
 
                 <div>
-                    <div class="card-holder columns-1 sm:columns-2 xl:columns-3 gap-4">
+                    <div class="card-holder grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
                         <div class="loading flex w-full justify-center p-10">
                             <i class="fa-solid fa-circle-notch fa-spin text-4xl"></i>
                         </div>

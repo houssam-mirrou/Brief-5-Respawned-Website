@@ -13,9 +13,16 @@ const platform_filter = document.querySelector(".platform-filter");
 const plat_items = document.querySelector(".patform-items");
 plat_items.classList.add("flex", "flex-col", "text-xl", "gap-2");
 const home = document.querySelector(".home");
+const favorites_page = document.querySelector(".favorites");
 const favorite = document.querySelector(".favorite");
 const game_pop_up = document.querySelector(".game-pop-up");
 const filter_body_conainer = document.querySelector(".filter-body-conainer");
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+const home_icon = document.querySelector(".home-icon");
+const fav_home_icon = document.querySelector(".fav-icon");
+const phone_heart = document.querySelector(".phone-heart");
+const nav_home = document.querySelector(".nav-home");
+
 
 function create_icons(plateforms) {
     let ps_icon = document.createElement("i");
@@ -101,11 +108,20 @@ function create_icons(plateforms) {
     return icon_holder;
 }
 
+let fav_games = [];
+
 function create_card(game) {
+    favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const exists = favorites.some(fav => fav.id === game.id);
     //creating card icons
 
     let fav_icon = document.createElement("i");
-    fav_icon.classList.add("ri-heart-3-line", "text-3xl");
+    if (exists) {
+        fav_icon.classList.add("ri-heart-3-fill", "text-3xl");
+    }
+    else {
+        fav_icon.classList.add("ri-heart-3-line", "text-3xl");
+    }
     //game title
     let title = document.createElement("h1");
     title.classList.add("text-xl");
@@ -125,6 +141,24 @@ function create_card(game) {
     fav_holder.classList.add("flex", "justify-end", "w-11/12");
     fav_holder.appendChild(fav_icon);
     icon_holder.appendChild(fav_holder);
+    fav_icon.addEventListener("click", (event) => {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const exists = favorites.some(fav => fav.id === game.id);
+        event.stopPropagation();
+        if (exists) {
+            let i = fav_games.indexOf(game);
+            favorites = favorites.filter(fav => fav.id !== game.id);
+            fav_icon.className = "ri-heart-3-line text-3xl";
+            console.log(favorites);
+        }
+        else {
+            favorites.push(game);
+            fav_icon.className = "ri-heart-3-fill text-3xl";
+            console.log(favorites);
+
+        }
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+    });
     //adding element to card
 
     card.classList.add(
@@ -198,9 +232,12 @@ function create_card(game) {
         while (game_pop_up.firstChild) {
             game_pop_up.removeChild(game_pop_up.firstChild);
         }
-        game_pop(temp_list);
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const exists = favorites.some(fav => fav.id === game.id);
+        game_pop(temp_list, exists, game);
         game_pop_up.classList.toggle("hidden");
         filter_body_conainer.classList.toggle("hidden");
+
 
     });
     card_div.appendChild(card);
@@ -210,13 +247,11 @@ function create_card(game) {
 
 let pop_up = false;
 
-function game_pop(game) {
+function game_pop(game, exists, current_game) {
     const temp_pop = document.createElement("div");
     temp_pop.classList.add("flex", "flex-col", "text-white", "text-2xl", "rounded-3xl", "bg-[#5F6261]", "w-full");
     const head_div = document.createElement("div");
     head_div.classList.add("flex", "flex-row");
-    const img_div = document.createElement("div");
-    img_div.classList.add("h-4/6", "w-4/6");
     const img = document.createElement("img");
     img.src = game.img;
     img.classList.add(
@@ -227,7 +262,6 @@ function game_pop(game) {
         "object-center",
         "shadow-md"
     );
-    img_div.appendChild(img);
     head_div.appendChild(img);
     const right_container = document.createElement("div");
     right_container.classList.add("flex", "flex-col", "w-1/2", "p-8", "gap-3");
@@ -236,7 +270,28 @@ function game_pop(game) {
     const tem_title = document.createElement("h1");
     tem_title.textContent = game.game_name;
     const fav_icon = document.createElement("i");
-    fav_icon.classList.add("ri-heart-3-line", "text-3xl");
+    if (exists) {
+        fav_icon.className = "ri-heart-3-fill text-3xl";
+    }
+    else {
+        fav_icon.className = "ri-heart-3-line text-3xl";
+    }
+    fav_icon.addEventListener("click", () => {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const exists = favorites.some(fav => fav.id === current_game.id);
+        if (exists) {
+            favorites = favorites.filter(fav => fav.id !== current_game.id);
+            fav_icon.className = "ri-heart-3-line text-3xl";
+            console.log(favorites);
+        }
+        else {
+            favorites.push(current_game);
+            fav_icon.className = "ri-heart-3-fill text-3xl";
+            console.log(favorites);
+
+        }
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+    })
     title_div.appendChild(tem_title);
     title_div.appendChild(fav_icon);
     const icons_div = create_icons(game.plateforms);
@@ -273,7 +328,7 @@ function game_pop(game) {
     right_container.appendChild(rank);
     head_div.appendChild(right_container);
     const about_div = document.createElement("div");
-    about_div.classList.add("flex", "flex-col", "gap-3","pl-10","pr-10","pb-10","pt-5");
+    about_div.classList.add("flex", "flex-col", "gap-3", "pl-10", "pr-10", "pb-10", "pt-5");
     const about = document.createElement("h1");
     about.textContent = "About";
     const description = document.createElement("p");
@@ -286,16 +341,7 @@ function game_pop(game) {
     temp_pop.appendChild(head_div);
     temp_pop.appendChild(about_div);
     game_pop_up.appendChild(temp_pop);
-    game_pop_up.addEventListener("click", (event) => {
-
-        console.log(pop_up);
-        if (event.target === game_pop_up) {
-            game_pop_up.classList.add("hidden");
-            filter_body_conainer.classList.remove("hidden");
-        }
-        pop_up = false;
-        console.log(pop_up);
-    })
+    console.log(game_pop_up);
 
 }
 
@@ -490,6 +536,14 @@ function createPlatItem(genreName) {
 }
 
 function filter_by_rate(game_filtred, limit) {
+    if (home_selected === true) {
+        game_filtred = current_games_array;
+    }
+    else {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        console.log(favorites);
+        game_filtred = favorites;
+    }
     let sorted_games = [...game_filtred];
 
     sorted_games.sort((a, b) => b.rating - a.rating);
@@ -501,11 +555,12 @@ function filter_by_rate(game_filtred, limit) {
     return sorted_games;
 }
 function best_rate(game_filtred, rate) {
-    if (rate === "Top 100" || rate === 100) {
+    if (rate === "100") {
+        console.log(rate);
         return filter_by_rate(game_filtred, 100);
-    } else if (rate === "Top 200" || rate === 200) {
+    } else if (rate === "200") {
         return filter_by_rate(game_filtred, 200);
-    } else if (rate === "Top 300" || rate === 300) {
+    } else if (rate === "300") {
         return filter_by_rate(game_filtred, 300);
     } else {
         return game_filtred; // no filter applied
@@ -573,7 +628,20 @@ let genre_selected = [];
 let game_filtred = [];
 
 function apply_filters(game_list = current_games_array, topLimit = null) {
+    console.log(typeof (topLimit));
     game_filtred = [];
+    if (home_selected === true) {
+        game_list = current_games_array;
+        console.log("byyyyy");
+    }
+    else if (fav_selected === true) {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        console.log("heyyy");
+        console.log(favorites);
+        game_list = favorites;
+        console.log(game_list);
+
+    }
 
     isFiltering = paltfom_selected !== "" || (genre_selected && genre_selected.length > 0) || topLimit != 0;
 
@@ -586,8 +654,13 @@ function apply_filters(game_list = current_games_array, topLimit = null) {
         } else {
             for (let plat of game.platforms) {
                 if (paltfom_selected === plat.platform.name) {
+                    console.log("matched");
                     platform_match = true;
                     break;
+                }
+                else {
+                    console.log("unmatched");
+
                 }
             }
         }
@@ -619,26 +692,36 @@ function apply_filters(game_list = current_games_array, topLimit = null) {
             game_filtred.push(game);
         }
     }
-
     if (topLimit) {
-        game_filtred = filter_by_rate(game_filtred, topLimit);
+        game_filtred = best_rate(game_filtred, topLimit);
+        console.log("gamesss : ");
+        console.log(game_filtred);
     }
 
     while (card_holder.firstChild) {
         card_holder.removeChild(card_holder.firstChild);
     }
-
+    console.log("***********************");
     console.log(game_filtred);
 
     if (game_filtred.length === 0) {
-        add_all_cards_unclick_filter(game_list);
-        results.textContent = "No games were found with your filter";
+        if (fav_selected === true) {
+            while (card_holder.firstChild) {
+                card_holder.removeChild(card_holder.firstChild);
+            }
+            results.textContent = "No games were found with your filter for your favourites";
+        }
+        else {
+            add_all_cards_unclick_filter(game_list);
+            results.textContent = "No games were found with your filter";
+        }
     } else {
         for (let game of game_filtred) {
             create_card(game);
         }
         results.textContent = "Results found: " + game_filtred.length;
     }
+    console.log(game_list);
 
     if (!paltfom_selected && (!genre_selected || genre_selected.length === 0) && !topLimit) {
         isFiltering = false;
@@ -744,7 +827,7 @@ async function add_cards() {
         isLoading = false;
 
         window.addEventListener('scroll', () => {
-            if (isSearching === true || isFiltering === true || pop_up === true) {
+            if (isSearching === true || isFiltering === true || pop_up === true || favs_clicked === true) {
                 return;
             }
 
@@ -785,6 +868,30 @@ async function add_cards() {
     }
 }
 
+game_pop_up.addEventListener("click", (event) => {
+
+    console.log(pop_up);
+    if (event.target === game_pop_up) {
+        game_pop_up.classList.add("hidden");
+        while (card_holder.firstChild) {
+            card_holder.removeChild(card_holder.firstChild);
+        }
+        console.log("all done");
+        if (game_filtred.length !== 0) {
+            for (let game of game_filtred) {
+                create_card(game);
+            }
+        }
+        else {
+            for (let game of current_games_array) {
+                create_card(game);
+            }
+        }
+        filter_body_conainer.classList.remove("hidden");
+    }
+    pop_up = false;
+    console.log(pop_up);
+})
 
 
 async function add_filter() {
@@ -796,7 +903,6 @@ async function add_filter() {
         add_genre(genres.genres);
         add_plateforms(platforms.platforms);
         add_rating();
-
     } catch (err) {
         console.log("problem in " + err);
     }
@@ -804,3 +910,82 @@ async function add_filter() {
 
 add_cards();
 add_filter();
+
+home.classList.add("cursor-pointer");
+favorites_page.classList.add("cursor-pointer");
+nav_home.classList.add("cursor-pointer");
+
+let home_selected = true;
+let fav_selected = false;
+
+home.addEventListener("click", () => {
+    home_selected = true;
+    fav_selected = false;
+    fav_home_icon.className = "fav-icon" + " ri-heart-3-line text-3xl";
+    home_icon.className = "home-icon" + " ri-home-4-fill text-3xl";
+    favs_clicked = false;
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+    if (current_games_array.length !== 0) {
+        for (let game of current_games_array) {
+            create_card(game);
+        }
+        results.textContent = "Results found: " + current_games_array.length;
+    }
+    else {
+        add_cards();
+    }
+})
+
+nav_home.addEventListener("click", () => {
+    home_selected = true;
+    fav_selected = false;
+    fav_home_icon.className = "fav-icon" + " ri-heart-3-line text-3xl";
+    home_icon.className = "home-icon" + " ri-home-4-fill text-3xl";
+    favs_clicked = false;
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+    if (current_games_array.length !== 0) {
+        for (let game of current_games_array) {
+            create_card(game);
+        }
+        results.textContent = "Results found: " + current_games_array.length;
+    }
+    else {
+        add_cards();
+    }
+})
+
+let favs_clicked = false;
+
+function add_favs_card() {
+    favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    console.log(favorites);
+    while (card_holder.firstChild) {
+        card_holder.removeChild(card_holder.firstChild);
+    }
+    for (let game of favorites) {
+        create_card(game);
+    }
+    results.textContent = "Your totale favorites games: " + favorites.length;
+}
+
+favorites_page.addEventListener("click", () => {
+    favs_clicked = true;
+    home_selected = false;
+    fav_selected = true;
+    add_favs_card();
+    fav_home_icon.className = "fav-icon" + " ri-heart-3-fill text-3xl";
+    home_icon.className = "home-icon" + " ri-home-4-line text-3xl";
+})
+
+phone_heart.addEventListener("click", () => {
+    favs_clicked = true;
+    home_selected = false;
+    fav_selected = true;
+    add_favs_card();
+    fav_home_icon.className = "fav-icon" + " ri-heart-3-fill text-3xl";
+    home_icon.className = "home-icon" + " ri-home-4-line text-3xl";
+})
