@@ -162,7 +162,6 @@ function create_card(game) {
     //adding element to card
 
     card.classList.add(
-        "inline-block", "break-inside-avoid", "mb-6",
         "bg-[#5F6261]", "border-2", "border-[#3D4044]",
         "rounded-3xl", "font-semibold", "overflow-hidden", "shadow-md"
     );
@@ -207,8 +206,7 @@ function create_card(game) {
     text_container.appendChild(title);
     text_container.appendChild(release_div);
     text_container.appendChild(genre_div);
-
-
+    text_container.classList.add("text-card-container");
     card.appendChild(game_img);
     card.classList.add("bg-[#5F6261]");
     card.appendChild(text_container);
@@ -240,6 +238,27 @@ function create_card(game) {
 
 
     });
+    const rate_div = document.createElement("div");
+    const rate_text = document.createElement("h1");
+    card_div.addEventListener("mouseover", () => {
+        rate_div.innerHTML = "";
+        rate_div.classList.add("flex", "felx-row", "place-content-between");
+
+        rate_text.textContent = "Rate :";
+        rate_text.classList.add("text-[#B0B3B8]");
+        const rate = document.createElement("h1");
+        rate.textContent = game.rating;
+        rate_div.appendChild(rate_text);
+        rate_div.appendChild(rate);
+        text_container.appendChild(rate_div);
+
+    })
+    card_div.addEventListener("mouseout", () => {
+        text_container.removeChild(rate_div);
+
+    })
+
+
     card_div.appendChild(card);
     card_holder.appendChild(card_div);
 
@@ -352,7 +371,7 @@ function add_genre(genres) {
     temp_but.classList.add("text-left", "flex");
     temp_but.textContent = genres.length - 8 + " More";
     for (let i = 0; i < Math.min(8, genres.length); i++) {
-        const item_div = createGenreItem(genres[i]);
+        const item_div = createGenreItem(genres[i].name);
         genre_items.appendChild(item_div);
     }
 
@@ -431,7 +450,7 @@ function createGenreItem(genreName) {
 function showMoreGenres(container, genres, moreButton) {
 
     for (let i = 8; i < genres.length; i++) {
-        const item_div = createGenreItem(genres[i]);
+        const item_div = createGenreItem(genres[i].name);
         container.appendChild(item_div);
     }
 
@@ -455,7 +474,7 @@ function add_plateforms(plat) {
     temp_but.textContent = plat.length - 8 + " More";
 
     for (let i = 0; i < Math.min(8, plat.length); i++) {
-        const item_div = createPlatItem(plat[i]);
+        const item_div = createPlatItem(plat[i].name);
         plat_items.appendChild(item_div);
     }
 
@@ -569,7 +588,7 @@ function best_rate(game_filtred, rate) {
 
 function showMorePlatforms(container, plat, moreButton) {
     for (let i = 8; i < plat.length; i++) {
-        const item_div = createPlatItem(plat[i]);
+        const item_div = createPlatItem(plat[i].name);
         container.appendChild(item_div);
     }
 
@@ -653,13 +672,15 @@ function apply_filters(game_list = current_games_array, topLimit = null) {
             platform_match = true;
         } else {
             for (let plat of game.platforms) {
-                if (paltfom_selected === plat.platform.name) {
-                    console.log("matched");
+                paltfom_selected = paltfom_selected.trim();
+                let temp = plat.platform.name.trim();
+                if (paltfom_selected === temp) {
+                    console.log(plat.platform.name + "**************" + paltfom_selected);
                     platform_match = true;
                     break;
                 }
                 else {
-                    console.log("unmatched");
+                    console.log(plat.platform.name + "**************" + paltfom_selected);
 
                 }
             }
@@ -786,10 +807,21 @@ function isSubsequence(gameName, searchString) {
 
 function search_bar_page_filter(string) {
     let array_list_temp = [];
-    for (let game of current_games_array) {
-        let temp = game.name.trim().toLowerCase();
-        if (isSubsequence(temp, string) === true) {
-            array_list_temp.push(game);
+    if (home_selected === true) {
+        for (let game of current_games_array) {
+            let temp = game.name.trim().toLowerCase();
+            if (isSubsequence(temp, string) === true) {
+                array_list_temp.push(game);
+            }
+        }
+    }
+    else {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        for (let game of favorites) {
+            let temp = game.name.trim().toLowerCase();
+            if (isSubsequence(temp, string) === true) {
+                array_list_temp.push(game);
+            }
         }
     }
     while (card_holder.firstChild) {
@@ -877,14 +909,24 @@ game_pop_up.addEventListener("click", (event) => {
             card_holder.removeChild(card_holder.firstChild);
         }
         console.log("all done");
-        if (game_filtred.length !== 0) {
-            for (let game of game_filtred) {
-                create_card(game);
+        if (fav_selected === true) {
+            if (game_filtred.length !== 0) {
+                for (let game of game_filtred) {
+                    create_card(game);
+                }
+            } else {
+                add_favs_card();
             }
         }
         else {
-            for (let game of current_games_array) {
-                create_card(game);
+            if (game_filtred.length !== 0 && fav_selected !== true) {
+                for (let game of game_filtred) {
+                    create_card(game);
+                }
+            } else {
+                for (let game of current_games_array) {
+                    create_card(game);
+                }
             }
         }
         filter_body_conainer.classList.remove("hidden");
