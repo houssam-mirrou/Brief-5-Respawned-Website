@@ -126,6 +126,12 @@ function create_card(game) {
     let title = document.createElement("h1");
     title.classList.add("text-xl");
     title.textContent = game.name;
+    title.classList.add("cursor-pointer");
+    title.addEventListener("click", (event) => {
+        event.stopPropagation();
+        localStorage.setItem("game", JSON.stringify(game));
+        window.location.href = "game.html";
+    })
     //game image
     let game_img = document.createElement("img");
     game_img.src = game.background_image;
@@ -942,6 +948,7 @@ async function add_filter() {
         const palt_res = await fetch("https://debuggers-games-api.duckdns.org/api/platforms");
         const genres = await genre_res.json();
         const platforms = await palt_res.json();
+        console.log(platforms);
         add_genre(genres.genres);
         add_plateforms(platforms.platforms);
         add_rating();
