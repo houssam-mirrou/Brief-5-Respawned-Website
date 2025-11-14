@@ -371,7 +371,7 @@ function add_genre(genres) {
     temp_but.classList.add("text-left", "flex");
     temp_but.textContent = genres.length - 8 + " More";
     for (let i = 0; i < Math.min(8, genres.length); i++) {
-        const item_div = createGenreItem(genres[i]);
+        const item_div = createGenreItem(genres[i].name);
         genre_items.appendChild(item_div);
     }
 
@@ -450,7 +450,7 @@ function createGenreItem(genreName) {
 function showMoreGenres(container, genres, moreButton) {
 
     for (let i = 8; i < genres.length; i++) {
-        const item_div = createGenreItem(genres[i]);
+        const item_div = createGenreItem(genres[i].name);
         container.appendChild(item_div);
     }
 
@@ -474,7 +474,7 @@ function add_plateforms(plat) {
     temp_but.textContent = plat.length - 8 + " More";
 
     for (let i = 0; i < Math.min(8, plat.length); i++) {
-        const item_div = createPlatItem(plat[i]);
+        const item_div = createPlatItem(plat[i].name);
         plat_items.appendChild(item_div);
     }
 
@@ -588,7 +588,7 @@ function best_rate(game_filtred, rate) {
 
 function showMorePlatforms(container, plat, moreButton) {
     for (let i = 8; i < plat.length; i++) {
-        const item_div = createPlatItem(plat[i]);
+        const item_div = createPlatItem(plat[i].name);
         container.appendChild(item_div);
     }
 
@@ -807,10 +807,21 @@ function isSubsequence(gameName, searchString) {
 
 function search_bar_page_filter(string) {
     let array_list_temp = [];
-    for (let game of current_games_array) {
-        let temp = game.name.trim().toLowerCase();
-        if (isSubsequence(temp, string) === true) {
-            array_list_temp.push(game);
+    if (home_selected === true) {
+        for (let game of current_games_array) {
+            let temp = game.name.trim().toLowerCase();
+            if (isSubsequence(temp, string) === true) {
+                array_list_temp.push(game);
+            }
+        }
+    }
+    else {
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        for (let game of favorites) {
+            let temp = game.name.trim().toLowerCase();
+            if (isSubsequence(temp, string) === true) {
+                array_list_temp.push(game);
+            }
         }
     }
     while (card_holder.firstChild) {
@@ -908,7 +919,7 @@ game_pop_up.addEventListener("click", (event) => {
             }
         }
         else {
-            if (game_filtred.length !== 0 && fav_selected!== true) {
+            if (game_filtred.length !== 0 && fav_selected !== true) {
                 for (let game of game_filtred) {
                     create_card(game);
                 }
